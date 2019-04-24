@@ -19,7 +19,7 @@ update : Msg -> Model -> Model
 update msg model =
   case msg of
     Add text ->
-      model ++ (List.singleton <| text)
+      model ++  [text]
 
 view : Model -> Html Msg
 view model =
