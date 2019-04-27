@@ -18,7 +18,7 @@ type Msg =
 init : Model
 init =
   []
-
+  
 update : Msg -> Model -> Model
 update msg model =
   case msg of
@@ -26,16 +26,28 @@ update msg model =
       model ++  [note]
 
     Edit old new ->
-      LE.updateIf (\note -> note == old) (\note -> new) model
+      editNote old new model
 
     Delete note ->
-      LE.remove note model
+      delete note model
 
-{--
+{--}
 editNote : String -> String -> Model -> Model
 editNote old new model =
-  LE.updateIf (\note -> note == old) (\note -> new) model
--}
+  case LE.elemIndex old model of
+    Just i ->
+      LE.updateAt i (\note -> new) model
+
+    _ -> model
+--}
+
+delete : String -> Model -> Model
+delete note model =
+  case LE.elemIndex note model of
+    Just i ->
+      LE.removeAt i model
+
+    _ -> model
 
 view : Model -> Html Msg
 view model =
