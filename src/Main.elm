@@ -8,39 +8,65 @@ import List.Extra as LE
 main =
   Browser.sandbox { init = init, update = update, view = view }
 
-type alias Model = List String
+type alias Model =
+  {
+    input : String,
+    notes : List String
+  }
 
 type Msg =
-     Add String
+     Submit
+  |  Update String
   |  Edit String String
   |  Delete String
 
 init : Model
 init =
-  []
-  
+  {
+    input = ""
+  , notes = []
+  }
+
 update : Msg -> Model -> Model
 update msg model =
   case msg of
-    Add note ->
-      model ++  [note]
+    Submit ->
+      {
+        input = ""
+        , notes = [model.input] ++ model.notes
+      }
 
+    Update note ->
+      { model | input = note }
+
+    _ ->
+      model
+
+
+{--
     Edit old new ->
       editNote old new model
 
     Delete note ->
       delete note model
+--}
 
-{--}
+addNote : String -> Model -> Model
+addNote note model =
+    { model | input = note }
+
+{--
 editNote : String -> String -> Model -> Model
 editNote old new model =
   case LE.elemIndex old model of
     Just i ->
       LE.updateAt i (\note -> new) model
 
+
     _ -> model
 --}
 
+{--
 delete : String -> Model -> Model
 delete note model =
   case LE.elemIndex note model of
@@ -48,23 +74,26 @@ delete note model =
       LE.removeAt i model
 
     _ -> model
+--}
 
 view : Model -> Html Msg
 view model =
-  div []
-     [ div []  (List.map (\txt -> text txt) (update (Edit "kutya" "cica") model))
-     , tests
+  div [] <|
+     [ input [type_ "text", placeholder "Note", value <| model.input, onInput Update] []
+     , button [onClick Submit] [text "Submit"]
+     , div []  (List.map (\txt -> div [] [text txt])  model.notes)
      ]
+     ++ tests
 
-tests : Html Msg
+{--}
+tests : List (Html Msg)
 tests =
   let
     ok = div [ style "color" "green" ] [ text "OK" ]
     err = div [ style "color" "red" ] [ text "Eh.." ]
-    model = ["hello", "kutya", "haha"]
+    model = { input = "egy", notes = ["ketto", "harom"] }
   in
-      [ update (Add "p") model == ["hello", "kutya", "haha", "p"]
-      , update (Edit "kutya" "cica") model == ["hello", "cica", "haha"]
-      , update (Delete "haha") model == ["hello", "kutya"]]
+      [ update Submit model == { input = "", notes = ["egy", "ketto", "harom"] }
+      ]
         |> List.map (\bool -> if bool then ok else err)
-        |> div []
+--}
